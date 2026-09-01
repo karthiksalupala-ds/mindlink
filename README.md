@@ -2,10 +2,8 @@
 
 **Shared Brain between Human & AI**
 
-Live collaborative thinking canvas — Explore, Debate, Decide.  
-With **Groq** (text + voice), free **images**, and **WebMCP** tools.
-
----
+Live collaborative thinking canvas — Explore, Debate, Decide.
+With **Groq** (text + voice), free **images**, **WebMCP**, and a premium neural UI.
 
 ## Setup
 
@@ -18,41 +16,17 @@ npm run dev
 
 Open http://localhost:3000
 
-Without `GROQ_API_KEY` the app still works with smart mock thoughts.
-
----
-
 ## Features
 
-- Explore mode — structured thoughts (risk, opportunity, insight…)
-- **Debate mode** — Optimist vs Pessimist on the same canvas
-- Per-thought **image** (Pollinations, free)
-- Per-thought **voice** (Groq TTS when key is set)
-- Expand / Challenge / Lock Decision
+- Explore & Debate modes
+- NVIDIA-style animated network background
+- Premium neural thinking loader
+- Dark glass thought cards + glow connections
+- Per-thought image (Pollinations) & voice (Groq TTS)
 - WebMCP tools for agents
 
----
+## Models (Groq)
 
-## Env
-
-| Key | Required | Purpose |
-|-----|----------|---------|
-| `GROQ_API_KEY` | Recommended | Thinking + TTS |
-| `OPENROUTER_API_KEY` | Optional | Backup |
-| `HF_TOKEN` | Optional | Better images later |
-
-Never commit `.env.local`.
-
----
-
-## Demo
-
-1. Pick **Explore** or **Debate**
-2. Enter a hard question
-3. Watch thoughts appear
-4. Generate image / play voice on a card
-5. Lock decision
-
----
+Uses `openai/gpt-oss-20b`, `openai/gpt-oss-120b`, `qwen/qwen3.6-27b`, `qwen/qwen3.8-27b` with automatic fallback + mock thoughts.
 
 MIT · WebMCP Challenge
