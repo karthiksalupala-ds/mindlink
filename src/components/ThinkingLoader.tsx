@@ -1,7 +1,7 @@
 "use client";
 
 /** Premium animated brain / neural loader */
-export default function ThinkingLoader({ label = "AI is thinking with you\u2026" }: { label?: string }) {
+export default function ThinkingLoader({ label = "AI is thinking with you…" }: { label?: string }) {
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative h-16 w-16">
