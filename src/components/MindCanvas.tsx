@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import { useMindStore } from "@/lib/store";
 import ThoughtNode from "./ThoughtNode";
 import Connections from "./Connections";
+import NetworkBackground from "./NetworkBackground";
+import ThinkingLoader from "./ThinkingLoader";
 import type { ThoughtType } from "@/lib/types";
 
 export default function MindCanvas() {
@@ -84,20 +86,21 @@ export default function MindCanvas() {
   return (
     <div
       id="mind-canvas"
-      className="relative h-full w-full overflow-auto bg-zinc-50 dark:bg-zinc-950"
+      className="relative h-full w-full overflow-auto bg-[#07070c]"
     >
+      <NetworkBackground intensity={1.1} />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(88,28,135,0.15),transparent_55%)]" />
       <div className="relative" style={{ width: 1700, height: 1200, minHeight: "100%" }}>
         <Connections />
         {session.thoughts.map((t) => (
           <ThoughtNode key={t.id} thought={t} />
         ))}
       </div>
-
       {isThinking && (
-        <div className="absolute inset-0 flex items-start justify-center pt-28">
-          <div className="rounded-full bg-white px-6 py-3 shadow-lg dark:bg-zinc-900">
-            AI is thinking with you…
-          </div>
+        <div className="pointer-events-none absolute inset-0 z-50 flex items-start justify-center pt-24">
+          <ThinkingLoader
+            label={session.mode === "debate" ? "Debating both sides\u2026" : "AI is thinking with you\u2026"}
+          />
         </div>
       )}
     </div>
