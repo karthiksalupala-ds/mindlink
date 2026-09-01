@@ -6,7 +6,7 @@ import ThoughtNode from "./ThoughtNode";
 import Connections from "./Connections";
 import NetworkBackground from "./NetworkBackground";
 import ThinkingLoader from "./ThinkingLoader";
-import type { ThoughtType } from "@/lib/types";
+import type { ThoughtType, PathId } from "@/lib/types";
 
 export default function MindCanvas() {
   const session = useMindStore((s) => s.session);
@@ -54,7 +54,11 @@ export default function MindCanvas() {
           return;
         }
 
-        const thoughts = (data.thoughts || []) as { content: string; type: string }[];
+        const thoughts = (data.thoughts || []) as {
+          content: string;
+          type: string;
+          path?: string;
+        }[];
 
         if (!thoughts.length) {
           addThought("What matters most right now?", "question", "ai");
@@ -64,12 +68,23 @@ export default function MindCanvas() {
           const ids: string[] = [];
           for (let i = 0; i < thoughts.length; i++) {
             const t = thoughts[i];
-            const id = addThought(t.content, (t.type || "idea") as ThoughtType, "ai");
+            const path = (t.path as PathId) || undefined;
+            const id = addThought(
+              t.content,
+              (t.type || "idea") as ThoughtType,
+              "ai",
+              undefined,
+              undefined,
+              undefined,
+              path ? { path } : undefined
+            );
             ids.push(id);
-            await new Promise((r) => setTimeout(r, 50));
+            await new Promise((r) => setTimeout(r, 45));
           }
-          for (let i = 0; i < ids.length - 1; i++) {
-            if (i % 2 === 0) addConnection(ids[i], ids[i + 1]);
+          if (mode !== "parallel") {
+            for (let i = 0; i < ids.length - 1; i++) {
+              if (i % 2 === 0) addConnection(ids[i], ids[i + 1]);
+            }
           }
         }
       } catch (err) {
@@ -84,13 +99,27 @@ export default function MindCanvas() {
   if (!session) return null;
 
   return (
-    <div
-      id="mind-canvas"
-      className="relative h-full w-full overflow-auto bg-[#07070c]"
-    >
+    <div id="mind-canvas" className="relative h-full w-full overflow-auto bg-[#07070c]">
       <NetworkBackground intensity={1.1} />
-
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(88,28,135,0.15),transparent_55%)]" />
+
+      {session.mode === "parallel" && (
+        <div className="pointer-events-none absolute top-4 left-0 right-0 z-20 flex justify-center gap-8 px-8">
+          {[
+            { id: "pathA", label: "Path A · Act now", color: "#22C55E" },
+            { id: "pathB", label: "Path B · Wait", color: "#F59E0B" },
+            { id: "pathC", label: "Path C · Pilot", color: "#38BDF8" },
+          ].map((p) => (
+            <div
+              key={p.id}
+              className="rounded-full border px-4 py-1.5 text-xs font-semibold backdrop-blur"
+              style={{ borderColor: `${p.color}55`, color: p.color, background: `${p.color}15` }}
+            >
+              {p.label}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="relative" style={{ width: 1700, height: 1200, minHeight: "100%" }}>
         <Connections />
@@ -100,9 +129,15 @@ export default function MindCanvas() {
       </div>
 
       {isThinking && (
-        <div className="pointer-events-none absolute inset-0 flex items-start justify-center pt-24 z-50">
+        <div className="pointer-events-none absolute inset-0 z-50 flex items-start justify-center pt-24">
           <ThinkingLoader
-            label={session.mode === "debate" ? "Debating both sides…" : "AI is thinking with you…"}
+            label={
+              session.mode === "debate"
+                ? "Debating both sides…"
+                : session.mode === "parallel"
+                  ? "Mapping parallel lives…"
+                  : "AI is thinking with you…"
+            }
           />
         </div>
       )}
