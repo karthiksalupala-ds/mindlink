@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Brain, ArrowRight, Sparkles, Swords } from "lucide-react";
+import { Brain, ArrowRight, Sparkles, Swords, GitBranch } from "lucide-react";
 import { useMindStore } from "@/lib/store";
 import NetworkBackground from "./NetworkBackground";
 import type { SessionMode } from "@/lib/types";
@@ -16,7 +16,7 @@ const EXAMPLES = [
 export default function StartScreen() {
   const [question, setQuestion] = useState("");
   const [mode, setMode] = useState<SessionMode>("explore");
-  const { startSession } = useMindStore();
+  const { startSession, history } = useMindStore();
 
   const handleStart = (q?: string, m?: SessionMode) => {
     const final = (q || question).trim();
@@ -37,32 +37,37 @@ export default function StartScreen() {
         MindLink
       </h1>
       <p className="relative z-10 mb-8 max-w-md text-center text-base text-zinc-400">
-        Think together with AI on a shared mind canvas.
+        Think with AI on a shared mind canvas.
         <br />
-        <span className="text-sm text-zinc-500">Explore · Debate · Decide — with voice & visuals</span>
+        <span className="text-sm text-zinc-500">
+          Explore · Debate · Parallel · Roles · Memory
+        </span>
       </p>
 
-      <div className="relative z-10 mb-5 flex gap-1 rounded-2xl border border-white/10 bg-white/5 p-1 backdrop-blur-md">
-        <button
-          onClick={() => setMode("explore")}
-          className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition ${
-            mode === "explore"
-              ? "bg-violet-600 text-white shadow-lg shadow-violet-600/30"
-              : "text-zinc-400 hover:text-white"
-          }`}
-        >
-          <Sparkles size={14} /> Explore
-        </button>
-        <button
-          onClick={() => setMode("debate")}
-          className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition ${
-            mode === "debate"
-              ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/30"
-              : "text-zinc-400 hover:text-white"
-          }`}
-        >
-          <Swords size={14} /> Debate
-        </button>
+      <div className="relative z-10 mb-5 flex flex-wrap justify-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1 backdrop-blur-md">
+        {(
+          [
+            { id: "explore" as const, label: "Explore", icon: Sparkles },
+            { id: "debate" as const, label: "Debate", icon: Swords },
+            { id: "parallel" as const, label: "Parallel", icon: GitBranch },
+          ] as const
+        ).map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setMode(id)}
+            className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium transition ${
+              mode === id
+                ? id === "debate"
+                  ? "bg-emerald-600 text-white shadow-lg"
+                  : id === "parallel"
+                    ? "bg-sky-600 text-white shadow-lg"
+                    : "bg-violet-600 text-white shadow-lg"
+                : "text-zinc-400 hover:text-white"
+            }`}
+          >
+            <Icon size={14} /> {label}
+          </button>
+        ))}
       </div>
 
       <div className="relative z-10 w-full max-w-xl">
@@ -100,11 +105,12 @@ export default function StartScreen() {
             </button>
           ))}
         </div>
-      </div>
 
-      <div className="relative z-10 mt-14 flex items-center gap-2 text-xs text-zinc-600">
-        <Sparkles size={12} />
-        <span>WebMCP · Groq · Voice · Images</span>
+        {history.length > 0 && (
+          <p className="mt-6 text-center text-xs text-zinc-600">
+            {history.length} decision{history.length > 1 ? "s" : ""} in memory · resume via History after a session
+          </p>
+        )}
       </div>
     </div>
   );
