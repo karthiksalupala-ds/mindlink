@@ -1,10 +1,9 @@
 /**
- * Groq client — models that work on YOUR account
+ * Groq client — models confirmed on user account
  */
 
 const GROQ_URL = "https://api.groq.com/openai/v1";
 
-// Only models from your Groq console
 const DEFAULT_MODELS = [
   "openai/gpt-oss-20b",
   "openai/gpt-oss-120b",
