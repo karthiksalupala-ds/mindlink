@@ -266,6 +266,27 @@ export function useWebMCPTools() {
       },
     });
 
+    // 8. Retrieve real research papers for the workspace
+    register({
+      name: "find_research_papers",
+      description:
+        "Search OpenAlex for real research papers related to a topic, returning titles, authors, years, citations, open-access status, abstracts, and source links.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          query: { type: "string", description: "Research topic, question, or keywords" },
+        },
+        required: ["query"],
+      },
+      async execute({ query }: { query: string }) {
+        const response = await fetch(`/api/papers?search=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        return {
+          content: [{ type: "text", text: JSON.stringify(data) }],
+        };
+      },
+    });
+
     console.info("[MindLink] WebMCP tools registered successfully.");
 
     return () => {

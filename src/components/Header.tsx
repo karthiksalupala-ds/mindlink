@@ -186,7 +186,7 @@ export default function Header() {
                       ? "Research · "
                       : "Exploring · "}
               </span>
-              {session.question}
+              {session.question.replace(/^\[PAPER EXPLAINER\]\s*/i, "")}
             </p>
           </div>
         )}

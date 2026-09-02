@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      const system = buildSystem(mode, role, action);
+      const system = buildSystem(mode, role, action, question);
       const raw = await groqChat([
         { role: "system", content: system },
         { role: "user", content: question },
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function buildSystem(mode?: string, role?: string, action?: string) {
+function buildSystem(mode?: string, role?: string, action?: string, question = "") {
   if (action === "outcomes") {
     return `Return ONLY a JSON array of exactly 3 objects:
 [{"label":"best","title":"...","content":"2 sentences"},{"label":"likely","title":"...","content":"..."},{"label":"worst","title":"...","content":"..."}]
@@ -105,6 +105,13 @@ pathA = bold move now, pathB = wait and prepare, pathC = small reversible experi
   }
 
   if (mode === "research") {
+    if (question.startsWith("[PAPER EXPLAINER]")) {
+      return `You are a research paper explainer. The user provides a paper abstract, passage, or research question.
+Return ONLY a JSON array of 8-10 objects. Each object:
+{"content":"plain-language explanation","type":"claim"|"evidence"|"question"|"insight"|"risk"|"gap"|"contradiction"|"data","sourceLabel":"paper passage or section","trust":"high"|"medium"|"low"|"unverified"}
+Build a connected learning map covering: the research question, method, key finding, evidence, practical meaning, limitation, contradiction or uncertainty, and one open question.
+Explain technical ideas simply without inventing facts. If the input is too short to establish evidence, mark trust as unverified and say what is missing. No markdown outside JSON.\n\nInput:\n${question.slice("[PAPER EXPLAINER]".length).trim()}`;
+    }
     return `You are an idea-validation researcher. The user describes a product/startup idea.
 Return ONLY a JSON array of 8-10 objects. Each object:
 {"content":"one clear finding or claim","type":"claim"|"evidence"|"competitor"|"gap"|"market"|"risk"|"contradiction"|"question","sourceLabel":"short source name or Unknown","trust":"high"|"medium"|"low"|"unverified"}
@@ -223,6 +230,18 @@ function getMockOutcomes(question: string) {
 
 function getMockThoughts(question: string, mode?: string, role?: string, action?: string) {
   if (action === "outcomes") return [];
+  if (mode === "research" && question.startsWith("[PAPER EXPLAINER]")) {
+    return [
+      { content: "Research question: How can shared solar improve access for renters?", type: "question", sourceLabel: "Input passage", trust: "medium" },
+      { content: "Plain-language claim: Community solar lets people benefit from renewable energy without owning a rooftop system.", type: "claim", sourceLabel: "Input passage", trust: "medium" },
+      { content: "Method: The authors compare outcomes across three pilot programs.", type: "data", sourceLabel: "Input passage", trust: "medium" },
+      { content: "Key evidence: Access appears to improve for renters, but the passage does not provide the underlying numbers.", type: "evidence", sourceLabel: "Input passage", trust: "unverified" },
+      { content: "Why it matters: Financing and local policy may determine whether the model works outside the pilots.", type: "insight", sourceLabel: "Interpretation", trust: "low" },
+      { content: "Limitation: The evidence is early and lacks long-term results.", type: "risk", sourceLabel: "Input passage", trust: "high" },
+      { content: "Open question: Which financing and policy conditions produce durable adoption?", type: "gap", sourceLabel: "Derived question", trust: "unverified" },
+      { content: "Suggested next step: Find the full paper and verify the pilot sample sizes, timeframe, and measured outcomes.", type: "idea", sourceLabel: "Research follow-up", trust: "high" },
+    ];
+  }
   if (role) {
     return [
       { content: `[${role}] Name the real constraint you're avoiding naming.`, type: "role" },
