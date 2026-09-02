@@ -9,11 +9,18 @@ export type ThoughtType =
   | "data"
   | "optimist"
   | "pessimist"
-  | "role";
+  | "role"
+  // Evidence Mind
+  | "claim"
+  | "evidence"
+  | "competitor"
+  | "gap"
+  | "market"
+  | "contradiction";
 
 export type PathId = "main" | "pathA" | "pathB" | "pathC";
 
-export type SessionMode = "explore" | "debate" | "parallel";
+export type SessionMode = "explore" | "debate" | "parallel" | "research";
 
 export type RoleId =
   | "future_you"
@@ -21,6 +28,8 @@ export type RoleId =
   | "mentor"
   | "devil"
   | "expert";
+
+export type TrustLevel = "high" | "medium" | "low" | "unverified";
 
 export interface Thought {
   id: string;
@@ -33,6 +42,10 @@ export interface Thought {
   imageUrl?: string;
   path?: PathId;
   role?: RoleId;
+  /** Evidence Mind fields */
+  sourceUrl?: string;
+  sourceLabel?: string;
+  trust?: TrustLevel;
   createdAt: number;
 }
 
@@ -58,6 +71,8 @@ export interface MindSession {
   mode: SessionMode;
   finalDecision?: string;
   outcomes?: OutcomeScenario[];
+  /** Research mode verdict */
+  researchVerdict?: string;
   createdAt: number;
 }
 
@@ -120,6 +135,12 @@ export const THOUGHT_COLORS: Record<ThoughtType, string> = {
   optimist: "#22C55E",
   pessimist: "#F43F5E",
   role: "#A78BFA",
+  claim: "#818CF8",
+  evidence: "#2DD4BF",
+  competitor: "#FB7185",
+  gap: "#FBBF24",
+  market: "#60A5FA",
+  contradiction: "#F87171",
 };
 
 export const THOUGHT_LABELS: Record<ThoughtType, string> = {
@@ -134,6 +155,12 @@ export const THOUGHT_LABELS: Record<ThoughtType, string> = {
   optimist: "Optimist",
   pessimist: "Pessimist",
   role: "Role",
+  claim: "Claim",
+  evidence: "Evidence",
+  competitor: "Competitor",
+  gap: "Gap",
+  market: "Market",
+  contradiction: "Conflict",
 };
 
 export const PATH_COLORS: Record<PathId, string> = {
