@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Brain, ArrowRight, Sparkles, Swords, GitBranch } from "lucide-react";
+import { Brain, ArrowRight, Sparkles, Swords, GitBranch, BookOpen } from "lucide-react";
 import { useMindStore } from "@/lib/store";
 import NetworkBackground from "./NetworkBackground";
 import type { SessionMode } from "@/lib/types";
@@ -40,7 +40,7 @@ export default function StartScreen() {
         Think with AI on a shared mind canvas.
         <br />
         <span className="text-sm text-zinc-500">
-          Explore · Debate · Parallel · Roles · Memory
+          Explore · Debate · Parallel · Research · Roles
         </span>
       </p>
 
@@ -50,6 +50,7 @@ export default function StartScreen() {
             { id: "explore" as const, label: "Explore", icon: Sparkles },
             { id: "debate" as const, label: "Debate", icon: Swords },
             { id: "parallel" as const, label: "Parallel", icon: GitBranch },
+            { id: "research" as const, label: "Research", icon: BookOpen },
           ] as const
         ).map(({ id, label, icon: Icon }) => (
           <button
@@ -61,7 +62,9 @@ export default function StartScreen() {
                   ? "bg-emerald-600 text-white shadow-lg"
                   : id === "parallel"
                     ? "bg-sky-600 text-white shadow-lg"
-                    : "bg-violet-600 text-white shadow-lg"
+                    : id === "research"
+                      ? "bg-teal-600 text-white shadow-lg"
+                      : "bg-violet-600 text-white shadow-lg"
                 : "text-zinc-400 hover:text-white"
             }`}
           >
@@ -81,7 +84,7 @@ export default function StartScreen() {
                 handleStart();
               }
             }}
-            placeholder="What are you trying to decide or explore?"
+            placeholder={mode === "research" ? "Describe your idea to validate (product, audience, problem)…" : "What are you trying to decide or explore?"}
             rows={3}
             className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-5 py-4 pr-14 text-base text-white shadow-2xl outline-none backdrop-blur-md transition placeholder:text-zinc-500 focus:border-violet-500/50 focus:ring-4 focus:ring-violet-500/20"
           />
