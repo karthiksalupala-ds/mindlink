@@ -58,6 +58,8 @@ export default function MindCanvas() {
           content: string;
           type: string;
           path?: string;
+          sourceLabel?: string;
+          trust?: string;
         }[];
 
         if (!thoughts.length) {
@@ -67,16 +69,20 @@ export default function MindCanvas() {
         } else {
           const ids: string[] = [];
           for (let i = 0; i < thoughts.length; i++) {
-            const t = thoughts[i];
-            const path = (t.path as PathId) || undefined;
+            const th = thoughts[i];
+            const path = (th.path as PathId) || undefined;
+            const extra: any = {};
+            if (path) extra.path = path;
+            if (th.sourceLabel) extra.sourceLabel = th.sourceLabel;
+            if (th.trust) extra.trust = th.trust;
             const id = addThought(
-              t.content,
-              (t.type || "idea") as ThoughtType,
+              th.content,
+              (th.type || "idea") as ThoughtType,
               "ai",
               undefined,
               undefined,
               undefined,
-              path ? { path } : undefined
+              Object.keys(extra).length ? extra : undefined
             );
             ids.push(id);
             await new Promise((r) => setTimeout(r, 45));
@@ -136,7 +142,9 @@ export default function MindCanvas() {
                 ? "Debating both sides…"
                 : session.mode === "parallel"
                   ? "Mapping parallel lives…"
-                  : "AI is thinking with you…"
+                  : session.mode === "research"
+                    ? "Gathering evidence for your idea…"
+                    : "AI is thinking with you…"
             }
           />
         </div>
