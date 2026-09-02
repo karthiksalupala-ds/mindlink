@@ -1,7 +1,17 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 /** Premium animated brain / neural loader */
 export default function ThinkingLoader({ label = "AI is thinking with you…" }: { label?: string }) {
+  const stages = ["Reading the context", "Finding relationships", "Shaping the next insight"];
+  const [stage, setStage] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setStage((value) => (value + 1) % stages.length), 1400);
+    return () => window.clearInterval(timer);
+  }, [stages.length]);
+
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative h-16 w-16">
@@ -25,8 +35,9 @@ export default function ThinkingLoader({ label = "AI is thinking with you…" }:
           <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-fuchsia-300" />
         </div>
       </div>
-      <div className="flex items-center gap-2 rounded-full border border-violet-500/20 bg-zinc-950/80 px-5 py-2.5 shadow-xl backdrop-blur-md">
+      <div className="flex min-w-64 flex-col items-center gap-1 rounded-2xl border border-violet-500/20 bg-zinc-950/85 px-5 py-3 shadow-xl backdrop-blur-md">
         <span className="text-sm font-medium tracking-wide text-zinc-100">{label}</span>
+        <span className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">{stages[stage]}</span>
         <span className="flex gap-0.5">
           <span className="h-1 w-1 animate-bounce rounded-full bg-violet-400 [animation-delay:-0.3s]" />
           <span className="h-1 w-1 animate-bounce rounded-full bg-fuchsia-400 [animation-delay:-0.15s]" />
