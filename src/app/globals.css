@@ -29,6 +29,12 @@ body {
   }
 }
 
+@keyframes mindlink-flow {
+  to {
+    stroke-dashoffset: -26;
+  }
+}
+
 /* thin scrollbar for canvas */
 #mind-canvas::-webkit-scrollbar {
   width: 8px;
