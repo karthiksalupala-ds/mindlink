@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { Pin, Trash2, ImageIcon, Volume2 } from "lucide-react";
 import { useMindStore } from "@/lib/store";
-import { THOUGHT_COLORS, THOUGHT_LABELS, type Thought } from "@/lib/types";
+import { THOUGHT_COLORS, THOUGHT_LABELS, ROLES, type Thought } from "@/lib/types";
 
 interface Props {
   thought: Thought;
@@ -102,84 +102,69 @@ export default function ThoughtNode({ thought }: Props) {
   return (
     <div
       ref={nodeRef}
-      className={`absolute select-none transition-shadow duration-200 ${
-        isDragging ? "z-50 cursor-grabbing" : "z-10 cursor-grab"
+      className={`absolute select-none transition-all duration-300 ${
+        isDragging ? "z-50 cursor-grabbing scale-[1.02]" : "z-10 cursor-grab"
       } ${isSelected ? "z-40" : ""}`}
-      style={{ left: thought.x, top: thought.y, width: thought.imageUrl ? 280 : 260 }}
+      style={{
+        left: thought.x,
+        top: thought.y,
+        width: thought.imageUrl ? 280 : 268,
+        animation: "mindlink-pop 0.45s cubic-bezier(0.16, 1, 0.3, 1) both",
+      }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
     >
       <div
-        className={`overflow-hidden rounded-2xl border-2 bg-white/95 shadow-lg backdrop-blur-md dark:bg-zinc-900/95 ${
-          isSelected ? "ring-2 ring-offset-2 ring-offset-transparent" : ""
-        } ${thought.pinned ? "ring-1 ring-amber-400" : ""}`}
+        className={`overflow-hidden rounded-2xl border backdrop-blur-xl transition-shadow duration-300 ${
+          thought.pinned ? "ring-1 ring-amber-400/80" : ""
+        }`}
         style={{
-          borderColor: color,
-          boxShadow: isSelected ? `0 0 0 2px ${color}50, 0 12px 28px -8px ${color}40` : undefined,
+          borderColor: `${color}99`,
+          background: `linear-gradient(145deg, rgba(12,12,20,0.92), rgba(18,18,28,0.88))`,
+          boxShadow: isSelected
+            ? `0 0 0 1px ${color}, 0 0 28px ${color}55, 0 16px 40px rgba(0,0,0,0.45)`
+            : `0 8px 28px rgba(0,0,0,0.35), 0 0 0 1px ${color}22, inset 0 1px 0 rgba(255,255,255,0.04)`,
         }}
       >
-        <div
-          className="flex items-center justify-between gap-2 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white"
-          style={{ backgroundColor: color }}
-        >
-          <span className="flex items-center gap-1.5 normal-case tracking-normal">
-            {thought.author === "ai" ? "✦ AI" : "You"}
-            <span className="opacity-90">· {THOUGHT_LABELS[thought.type] || thought.type}</span>
+        {/* accent bar */}
+        <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${color}, ${color}66)` }} />
+
+        <div className="flex items-center justify-between gap-2 px-3 py-1.5">
+          <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide" style={{ color }}>
+            <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 8px ${color}` }} />
+            {thought.author === "ai" ? "AI" : "You"}
+            <span className="text-zinc-500">·</span>
+            <span className="text-zinc-300">
+              {thought.role
+                ? ROLES.find((r) => r.id === thought.role)?.label || thought.role
+                : THOUGHT_LABELS[thought.type] || thought.type}
+            </span>
           </span>
-          <div className="flex items-center gap-0.5">
-            <button
-              onClick={genImage}
-              disabled={imgLoading}
-              className="rounded p-1 hover:bg-white/20 disabled:opacity-50"
-              title="Generate image"
-            >
+          <div className="flex items-center gap-0.5 text-zinc-400">
+            <button onClick={genImage} disabled={imgLoading} className="rounded-lg p-1 hover:bg-white/10 hover:text-white disabled:opacity-50" title="Generate image">
               <ImageIcon size={12} className={imgLoading ? "animate-pulse" : ""} />
             </button>
-            <button
-              onClick={speak}
-              disabled={speaking}
-              className="rounded p-1 hover:bg-white/20 disabled:opacity-50"
-              title="Speak"
-            >
+            <button onClick={speak} disabled={speaking} className="rounded-lg p-1 hover:bg-white/10 hover:text-white disabled:opacity-50" title="Speak">
               <Volume2 size={12} className={speaking ? "animate-pulse" : ""} />
             </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                pinThought(thought.id);
-              }}
-              className="rounded p-1 hover:bg-white/20"
-              title="Pin"
-            >
-              <Pin size={12} className={thought.pinned ? "fill-current" : ""} />
+            <button onClick={(e) => { e.stopPropagation(); pinThought(thought.id); }} className="rounded-lg p-1 hover:bg-white/10 hover:text-white" title="Pin">
+              <Pin size={12} className={thought.pinned ? "fill-amber-400 text-amber-400" : ""} />
             </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteThought(thought.id);
-              }}
-              className="rounded p-1 hover:bg-white/20"
-              title="Delete"
-            >
+            <button onClick={(e) => { e.stopPropagation(); deleteThought(thought.id); }} className="rounded-lg p-1 hover:bg-white/10 hover:text-red-400" title="Delete">
               <Trash2 size={12} />
             </button>
           </div>
         </div>
 
         {thought.imageUrl && (
-          <div className="relative aspect-square w-full bg-zinc-100 dark:bg-zinc-800">
+          <div className="relative aspect-[4/3] w-full bg-zinc-900">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={thought.imageUrl}
-              alt=""
-              className="h-full w-full object-cover"
-              loading="lazy"
-            />
+            <img src={thought.imageUrl} alt="" className="h-full w-full object-cover opacity-90" loading="lazy" />
           </div>
         )}
 
-        <div className="px-3 py-2.5">
+        <div className="px-3 pb-3 pt-1">
           {isEditing ? (
             <textarea
               autoFocus
@@ -187,26 +172,52 @@ export default function ThoughtNode({ thought }: Props) {
               onChange={(e) => setEditValue(e.target.value)}
               onBlur={saveEdit}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  saveEdit();
-                }
+                if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); saveEdit(); }
                 if (e.key === "Escape") setIsEditing(false);
               }}
-              className="w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 p-2 text-sm outline-none focus:border-violet-400 dark:border-zinc-700 dark:bg-zinc-800"
+              className="w-full resize-none rounded-xl border border-white/10 bg-black/40 p-2 text-sm text-zinc-100 outline-none focus:border-violet-500/50"
               rows={3}
               onPointerDown={(e) => e.stopPropagation()}
             />
           ) : (
-            <p
-              className="text-sm leading-relaxed text-zinc-800 dark:text-zinc-100"
-              onDoubleClick={() => {
-                setEditValue(thought.content);
-                setIsEditing(true);
-              }}
-            >
-              {thought.content}
-            </p>
+            <>
+              <p
+                className="text-[13px] leading-relaxed text-zinc-200"
+                onDoubleClick={() => { setEditValue(thought.content); setIsEditing(true); }}
+              >
+                {thought.content}
+              </p>
+              {(thought.sourceLabel || thought.trust) && (
+                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px]">
+                  {thought.sourceLabel && (
+                    <span className="rounded-md border border-white/10 bg-white/5 px-1.5 py-0.5 text-zinc-400">
+                      {thought.sourceUrl ? (
+                        <a href={thought.sourceUrl} target="_blank" rel="noreferrer" className="hover:text-violet-300">
+                          {thought.sourceLabel}
+                        </a>
+                      ) : (
+                        thought.sourceLabel
+                      )}
+                    </span>
+                  )}
+                  {thought.trust && (
+                    <span
+                      className={`rounded-md px-1.5 py-0.5 font-medium ${
+                        thought.trust === "high"
+                          ? "bg-emerald-500/15 text-emerald-300"
+                          : thought.trust === "medium"
+                            ? "bg-amber-500/15 text-amber-300"
+                            : thought.trust === "low"
+                              ? "bg-orange-500/15 text-orange-300"
+                              : "bg-zinc-500/15 text-zinc-400"
+                      }`}
+                    >
+                      {thought.trust}
+                    </span>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

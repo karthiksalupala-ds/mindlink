@@ -74,7 +74,13 @@ interface MindState {
     x?: number,
     y?: number,
     imageUrl?: string,
-    extra?: { path?: PathId; role?: RoleId }
+    extra?: {
+      path?: PathId;
+      role?: RoleId;
+      sourceUrl?: string;
+      sourceLabel?: string;
+      trust?: import("./types").TrustLevel;
+    }
   ) => string;
   updateThought: (id: string, updates: Partial<Thought>) => void;
   deleteThought: (id: string) => void;
@@ -125,6 +131,7 @@ export const useMindStore = create<MindState>((set, get) => ({
     const existing = session.thoughts.length;
     const path = extra?.path || "main";
 
+    // Parallel layout: columns
     let defaultX = x;
     let defaultY = y;
     if (defaultX === undefined || defaultY === undefined) {
@@ -151,6 +158,9 @@ export const useMindStore = create<MindState>((set, get) => ({
       imageUrl,
       path,
       role: extra?.role,
+      sourceUrl: extra?.sourceUrl,
+      sourceLabel: extra?.sourceLabel,
+      trust: extra?.trust,
       createdAt: Date.now(),
     };
 

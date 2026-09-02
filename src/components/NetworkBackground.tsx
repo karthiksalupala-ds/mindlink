@@ -61,6 +61,7 @@ export default function NetworkBackground({
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
 
+      // soft vignette glow center
       const g = ctx.createRadialGradient(w * 0.5, h * 0.35, 0, w * 0.5, h * 0.4, Math.max(w, h) * 0.7);
       g.addColorStop(0, "rgba(139, 92, 246, 0.07)");
       g.addColorStop(0.45, "rgba(88, 28, 135, 0.03)");
@@ -68,6 +69,7 @@ export default function NetworkBackground({
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
 
+      // update + links
       for (let i = 0; i < nodes.length; i++) {
         const a = nodes[i];
         a.x += a.vx;
@@ -92,11 +94,13 @@ export default function NetworkBackground({
         }
       }
 
+      // nodes
       for (const n of nodes) {
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(196, 181, 253, 0.75)";
         ctx.fill();
+        // glow
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.r * 3, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(139, 92, 246, 0.12)";
